@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>hw2</title>
+</head>
+
+
+
+<script type="text/javascript">
+    function viewJson(form) {
+
+        var url = form.URL.value;
+        xmlhttp = new XMLHttpRequest();
+        xmlhttp.open("GET",url,false);
+        xmlhttp.send();
+        // alert(xmlhttp.responseText);
+        win = window.open("","Assignment4","height:1000px,width:800px");
+        if (xmlhttp.readyState==4 && xmlhttp.status==200){
+
+            try {
+                jsonObj = JSON.parse(xmlhttp.responseText);
+
+                jsonObj.onload = generateHTML(jsonObj);
+
+                win.document.write(html_text);
+            }
+            catch (e) {
+                win.document.write("error");
+            }
+        }
+        else{
+            win.document.write("no json file")
+        }
+
+        win.document.close();
+
+    }
+    function generateHTML(jsonObj){
+        root=jsonObj.DocumentElement;
+        html_text="<html><head><title>JSON Parse Result</title></head><body>";
+        html_text+="<table border='2'>";
+
+        data=jsonObj.Mainline.Table.Row; // an array of data
+
+        headers=jsonObj.Mainline.Table.Header.Data;
+        html_text+="<tbody>";
+        html_text+="<tr>";
+        x=200; y=100;
+        // var header_keys = Object.keys(headers);
+        for(i=0; i<headers.length; i++) {
+            header=headers[i];
+            // if(header=="Rank") { header="Family"; x=120; y=55; }
+            // if(header=="Country") { headers[i]="Hubs"; }
+            // if(header=="Wiki Page") headers[i]="HomePage";
+            // if(header=="Wingspan") header="Wing Span";
+            // if(header=="height") header="Height";
+            html_text+="<th>"+header+"</th>";
+        }
+
+
+        html_text+="</tr>";
+        // output out the values
+        for(i=0; i<data.length; i++) //do for all data (one per row)
+        {
+            cur=data[i]; //get properties of a plane (an object)
+            html_text+="<tr>"; //start a new row of the output table
+            var data_keys = Object.keys(cur);
+            for(j=0;j<data_keys.length;j++)
+            {
+                prop = data_keys[j];
+                // alert(prop)
+                tmp = cur[prop];
+
+//        <td><a href='tmp '></a></td>
+
+                if(prop=="HomePage")
+                {//handle images separately
+                    html_text+="<td><a href='"+ tmp +"'>"+tmp+"</a></td>";
+                }
+                else if(prop=="Hubs")
+                {//handle images separately
+                    html_text+="<td><ul>"
+                    for (k=0;k<tmp["Hub"].length;k++){
+                        if (k==0) html_text+="<li><b>"+tmp["Hub"][k]+"</b></li>";
+                        else html_text+="<li><p>"+tmp["Hub"][k]+"</p></li>";
+                    }
+                    html_text+="</td>";
+                }
+                else if(prop=="Logo")
+                {//handle images separately
+                    html_text+="<td><img src='"+ tmp +"' width='"+x+"' height='"+y+"'></td>";
+                } else {
+                    html_text+="<td>"+ tmp +"</td>";
+                }
+            }
+            html_text+="</tr>";
+        }
+        html_text+="</tbody>";
+        html_text+="</table>";
+        html_text+="</bod"+"y></html>";
+
+    }
+
+
+
+</script>
+
+
+<body>
+
+<form style="text-align: center; position: relative; top: 300px;" name="myform" method="POST" id="location">
+    <p style="padding: 10px;font-size: 20px;">Enter URL of JSON file:</p>
+
+    <input style="height: 20px;width: 400px;padding: 10px; "type="text" name="URL" maxlength="255" size="100" value="http://penghuan.freevar.com/homework4/carlist.json"/>
+    <br />
+    <input style="height:40px;padding:10px" type="button" name="submit" value="submit" onclick="viewJson(this.form)"/>
+
+</form>
+
+
+</body>
+
+
+</html>
